@@ -1,0 +1,66 @@
+#!/usr/bin/env php
+<?php
+
+echo "\n-----------------------------\033[5m\033[1m\033[47;30m 12345六 SWOOLE CHAT 管理器 \033[0m------------------------------\n\n";
+if (!isset($argv[1]))
+{
+        echo "参数不存在！ [ start | stop | restart | clean ] \n";
+        exit;
+}
+else
+        $command = $argv[1];
+
+$log    = 'logs';
+$err    = 'errs';
+
+switch ($command)
+{
+        case 'start':
+		system('php server.php');
+                break;
+        case 'stop':
+		$pid = @file_get_contents('./pid');
+		if(empty($pid))
+		{
+			exit("\t\033[33;40m12345六 SWOOLE CHAT not running?\033[0m\n");
+		}
+		system("ps -ef | grep SWOOLE | grep -v grep | awk '{print$2}' | xargs kill -9");
+		system("rm -rf pid");
+		echo "\t 12345六 SWOOLE CHAT is stop \n";
+                break;
+        case 'restart':
+		$pid = @file_get_contents('./pid');
+		if(empty($pid))
+		{
+			exit("\t\033[33;40m12345六 SWOOLE CHAT not running?\033[0m\n");
+		}
+		
+		/*
+		posix_kill($pid, SIGKILL);
+		*/
+		system("ps -ef | grep SWOOLE | grep -v grep | awk '{print$2}' | xargs kill -9");
+                system("rm -rf pid");
+		echo "\t 12345六 SWOOLE CHAT is stop \n";
+		sleep(2);
+		
+		system('php server.php');
+                
+		break;
+	case 'clean':
+		system('rm -rf mylog', $res);
+		if (!$res)
+			echo $log."\t\033[1m\033[31m 文件清理成功！\033[0m\n";
+		else
+			echo $log."文件清理失败！\n";
+		break;
+        default:
+		echo "\t\033[1m\033[31m 我再给你一次组织语言的机会！\033[0m\n";
+                break;
+}
+
+
+
+/*---------------------------------common-------------------------------------*/
+
+
+echo "\n--------------------------- \033[5m\033[1m\033[47;30m 执行完毕 \033[0m----------------------------\n\n";
